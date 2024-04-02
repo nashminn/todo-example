@@ -1,0 +1,140 @@
+{
+  "type": "validation",
+  "on": "body",
+  "property": "/id",
+  "message": "Required property",
+  "expected": {
+    "id": 0,
+    "starred": false,
+    "completed": false,
+    "desc": ""
+  },
+  "found": {
+    "{\"id\": 3, \"starred\": false, \"completed\": false, \"desc\": \"some details for this todo\"}": ""
+  },
+  "errors": [
+    {
+      "type": 45,
+      "schema": {
+        "anyOf": [
+          {
+            "format": "numeric",
+            "default": 0,
+            "type": "string"
+          },
+          {
+            "type": "number"
+          }
+        ]
+      },
+      "path": "/id",
+      "message": "Required property"
+    },
+    {
+      "type": 45,
+      "schema": {
+        "type": "boolean"
+      },
+      "path": "/starred",
+      "message": "Required property"
+    },
+    {
+      "type": 45,
+      "schema": {
+        "type": "boolean"
+      },
+      "path": "/completed",
+      "message": "Required property"
+    },
+    {
+      "type": 45,
+      "schema": {
+        "type": "string"
+      },
+      "path": "/desc",
+      "message": "Required property"
+    },
+    {
+      "type": 42,
+      "schema": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "anyOf": [
+              {
+                "format": "numeric",
+                "default": 0,
+                "type": "string"
+              },
+              {
+                "type": "number"
+              }
+            ]
+          },
+          "starred": {
+            "type": "boolean"
+          },
+          "completed": {
+            "type": "boolean"
+          },
+          "desc": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "starred",
+          "completed",
+          "desc"
+        ],
+        "additionalProperties": false
+      },
+      "path": "/{\"id\": 3, \"starred\": false, \"completed\": false, \"desc\": \"some details for this todo\"}",
+      "value": "",
+      "message": "Unexpected property"
+    },
+    {
+      "type": 62,
+      "schema": {
+        "anyOf": [
+          {
+            "format": "numeric",
+            "default": 0,
+            "type": "string"
+          },
+          {
+            "type": "number"
+          }
+        ]
+      },
+      "path": "/id",
+      "message": "Expected union value"
+    },
+    {
+      "type": 14,
+      "schema": {
+        "type": "boolean"
+      },
+      "path": "/starred",
+      "message": "Expected boolean"
+    },
+    {
+      "type": 14,
+      "schema": {
+        "type": "boolean"
+      },
+      "path": "/completed",
+      "message": "Expected boolean"
+    },
+    {
+      "type": 54,
+      "schema": {
+        "type": "string"
+      },
+      "path": "/desc",
+      "message": "Expected string"
+    }
+  ]
+}
+
+curl -X POST -H "Content-Type: application/json" http://localhost:3000/todos -d '{"id": 3, "starred": false, "completed": false, "desc": "some details for this todo"}'

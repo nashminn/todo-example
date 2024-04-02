@@ -1,6 +1,9 @@
 import { Elysia, t } from 'elysia'
 
-const TODOS = [
+let lastId = 2
+
+// replacing const with let
+let TODOS = [
   {
     id: 1,
     starred: false,
@@ -16,6 +19,14 @@ const TODOS = [
 ]
 
 const app = new Elysia()
+  .get('/', ()=>[
+    {
+      'get /': 'here',
+      'get /todos': 'gets all todos',
+      'get /todos/:id': 'gets todo with id',
+      'post /todos': 'sends new todo'
+    }
+  ])
   .get('/todos', () => TODOS)
   .get(
     '/todos/:id',
@@ -32,11 +43,42 @@ const app = new Elysia()
       })
     }
   )
+  .delete('/todos/:id', 
+  ({params, error}) => {
+    const local = TODOS.filter((x)=>x.id !== params.id)
+    console.log(local)
+    TODOS = local
+  },
+  {
+    params: t.Object({
+      id: t.Numeric()
+    })
+  })
+  .post(
+    '/todos',
+    // ↓ hover me ↓
+    ({ body }) => {
+      console.log(body)
+      return body
+    },
+    {
+      body : t.Object({
+        id: t.Numeric(),
+        starred: t.Boolean(),
+        completed: t.Boolean(),
+        desc: t.String()
+      })
+    }
+  )
   .listen(3000)
 
 console.log(
   `🦊 Elysia is running at ${app.server?.hostname}:${app.server?.port}`
 )
+
+app.handle(new Request('http://localhost:3000/'))
+   .then(console.log)
+  
 /*
  * GET /todos
  * GET /todos/123421
