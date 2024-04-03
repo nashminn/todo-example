@@ -1,3 +1,4 @@
+import { startRemoteDebugger } from 'bun:jsc'
 import { Elysia, t } from 'elysia'
 
 let lastId = 2
@@ -46,8 +47,14 @@ const app = new Elysia()
   .delete('/todos/:id', 
   ({params, error}) => {
     const local = TODOS.filter((x)=>x.id !== params.id)
-    console.log(local)
+    const exists = TODOS.filter((x) => x.id === params.id)
+    if(!exists.length) {
+      return error(404, "Todo not found for deletion")
+    }
     TODOS = local
+    return {
+      message: "Deletion successful"
+    }
   },
   {
     params: t.Object({
@@ -58,10 +65,36 @@ const app = new Elysia()
     '/todos',
     // ↓ hover me ↓
     ({ body }) => {
-      console.log(body)
+      lastId += 1
+      const newTodo = {
+        id: lastId,
+        ...body
+      }
+      TODOS = [newTodo, ...TODOS]
+      return newTodo
+    },
+    {
+      body : t.Object({
+        starred: t.Boolean(),
+        completed: t.Boolean(),
+        desc: t.String()
+      })
+    }
+  )
+  .put(
+    '/todos/:id',
+    ({params, body, error}) => {
+      const local = TODOS.filter((x)=>x.id !== params.id)
+      const exists = TODOS.filter((x) => x.id === params.id)
+      if(!exists.length) return error(404, "Todo not found for editing")
+      console.log(local)
+      TODOS = [body, ...local]
       return body
     },
     {
+      params: t.Object({
+        id: t.Numeric()
+      }),
       body : t.Object({
         id: t.Numeric(),
         starred: t.Boolean(),
@@ -70,6 +103,30 @@ const app = new Elysia()
       })
     }
   )
+  .patch(
+    '/todos/:id',
+    ({ params, body, error }) => {
+      const todoIndex = TODOS.findIndex(todo => todo.id === params.id);
+      if (todoIndex === -1) {
+        return error(404, "Todo not found");
+      } else {
+        TODOS[todoIndex] = { ...TODOS[todoIndex], ...(body as Partial<{
+          id: number;
+          starred: boolean;
+          completed: boolean;
+          desc: string;
+        }>) };
+        return TODOS[todoIndex];
+      }
+    }, 
+    {
+      params: t.Object({
+        id: t.Numeric()
+      }), 
+      body: t.Unknown()
+    }
+  )
+  
   .listen(3000)
 
 console.log(
@@ -80,10 +137,10 @@ app.handle(new Request('http://localhost:3000/'))
    .then(console.log)
   
 /*
- * GET /todos
+ * GET /todos 
  * GET /todos/123421
- * POST /todos
- * PUT /todos/1234321 {}
- * PATCH /todos/12312312 {}
- * DELETE /todos/1231231
+ * POST /todos - done
+ * PUT /todos/1234321 {} -done
+ * PATCH /todos/12312312 {} 
+ * DELETE /todos/1231231 - done
  */
